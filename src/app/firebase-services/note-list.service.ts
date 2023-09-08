@@ -1,5 +1,5 @@
 import { Injectable, inject } from '@angular/core';
-import { Firestore, collection, doc } from '@angular/fire/firestore';
+import { Firestore, collection, collectionData, doc, onSnapshot } from '@angular/fire/firestore';
 import { Note } from '../interfaces/note.interface';
 
 @Injectable({
@@ -10,9 +10,70 @@ export class NoteListService {
   trashNotes: Note[] = [];
   normalNotes: Note[] = [];
 
+  // items$;
+  // items;
+
+  unsubTrash;
+  unsubNotes;
+
   firestore: Firestore = inject(Firestore);
 
-  constructor() { }
+  constructor() {
+    this.unsubTrash = this.subTrashList();
+    this.unsubNotes = this.subNotesList();
+
+    // this.unsubNotes = onSnapshot(this.getSingleDocRef('notes', '2QFVXw0siNVUFkC7ruMr'), (element) => {
+    //   // ...
+    // });
+
+
+    // // Alternative mit 'collectionData' ("in diesem Fall nicht empfohlen"):
+    // this.items$ = collectionData(this.getNotesRef());
+    // this.items = this.items$.subscribe(list => {
+    //   list.forEach(element => {
+    //     console.log(element);
+    //   });
+    // });
+  }
+
+  subTrashList() {
+    return onSnapshot(this.getTrashRef(), (list) => {
+      this.trashNotes = [];
+      list.forEach(element => {
+        // console.log('onSnapshot element:', element);
+        // console.log('onSnapshot element.id:', element.id);
+        // console.log('onSnapshot element.data():', element.data());
+        // console.log('onSnapshot this.setNoteObject(element.data(), element.id):', this.setNoteObject(element.data(), element.id));
+        this.trashNotes.push(this.setNoteObject(element.data(), element.id));
+      });
+    });
+  }
+
+  subNotesList() {
+    return onSnapshot(this.getNotesRef(), (list) => {
+      this.normalNotes = [];
+      list.forEach(element => {
+        this.normalNotes.push(this.setNoteObject(element.data(), element.id));
+      });
+    });
+  }
+
+  setNoteObject(obj: any, id: string): Note {
+    return {
+      id: id,
+      type: obj.type || 'note',
+      title: obj.title || '',
+      content: obj.content || '',
+      marked: obj.marked || false
+    }
+  }
+
+  ngOnDestroy() {
+    this.unsubTrash();
+    this.unsubNotes();
+
+    // this.items.unsubscribe();
+  }
 
   getNotesRef() {
     return collection(this.firestore, 'notes');
