@@ -1,0 +1,14 @@
+{
+  "targets": {
+    "dakeep-ff1b6": {
+      "hosting": {
+        "DAKeep": [
+          "dakeep-ff1b6"
+        ]
+      }
+    }
+  },
+  "projects": {
+    "default": "dakeep-ff1b6"
+  }
+}
