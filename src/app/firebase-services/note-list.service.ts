@@ -103,7 +103,9 @@ export class NoteListService {
   }
 
   subNotesList() {
-    const q = query(this.getNotesRef(), orderBy('title'), limit(10));
+    // const ref = collection(this.firestore, 'notes/5rEsvYhCR9tC2TTfvWwz/notesExtra'); // subcollection
+    // const q = query(ref, orderBy('title'), limit(100));
+    const q = query(this.getNotesRef(), orderBy('title'), limit(100));
     return onSnapshot(q, (list) => {
       this.normalNotes = [];
       list.forEach(element => {
@@ -124,7 +126,7 @@ export class NoteListService {
   }
 
   subMarkedNotesList() {
-    const q = query(this.getNotesRef(), where('marked', '==', true), limit(10));
+    const q = query(this.getNotesRef(), where('marked', '==', true), limit(100));
     return onSnapshot(q, (list) => {
       this.normalMarkedNotes = [];
       list.forEach(element => {
